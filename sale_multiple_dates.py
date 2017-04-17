@@ -77,8 +77,11 @@ class sale_order_dates(models.TransientModel):
                     cuotas.create({
                         'monto_cuota': (monto_cuota) if n_cuota != int(self.finaliza) else round(sale.price_unit,
                                                                                                  2) - c_monto,
+                        #'fecha_vencimiento': (fecha_v + relativedelta.relativedelta(
+                        #    days=int(sale.order_id.partner_id.property_payment_term.line_ids.days))).strftime(
+                        #    DEFAULT_SERVER_DATE_FORMAT),
                         'fecha_vencimiento': (fecha_v + relativedelta.relativedelta(
-                            days=int(sale.order_id.partner_id.property_payment_term.line_ids.days))).strftime(
+                            days=int(sale.order_id.partner_id.property_payment_term_id.line_ids.days))).strftime(
                             DEFAULT_SERVER_DATE_FORMAT),
                         'fecha_creacion': fecha,
                         'nro_cuota': (i + 1),

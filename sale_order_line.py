@@ -147,13 +147,13 @@ class sale_advance_payment_inv(models.TransientModel):
                         'origin': cuota.sale_id.name,
                         'type': 'out_invoice',
                         'reference': False,
-                        'account_id': cuota.sale_id.partner_id.property_account_receivable.id,
+                        'account_id': cuota.sale_id.partner_id.property_account_receivable_id.id,
                         'partner_id': cuota.sale_id.partner_invoice_id.id,
                         'currency_id': cuota.sale_id.pricelist_id.currency_id.id,
                         'comment': '',
-                        'payment_term': cuota.sale_id.payment_term.id,
-                        'fiscal_position': cuota.sale_id.fiscal_position.id or cuota.sale_id.partner_id.property_account_position.id,
-                        'section_id': cuota.sale_id.section_id.id,
+                        'payment_term_id': cuota.sale_id.payment_term_id.id,
+                        'fiscal_position_id': cuota.sale_id.fiscal_position_id.id or cuota.sale_id.partner_id.property_account_position_id.id,
+                        #'section_id': cuota.sale_id.team_id.id,
                     }
                     datos = self._prepare_advance_invoice_vals2(cr, uid, ids, datos, context=context)
                     # si es la ultima cuota
@@ -161,7 +161,8 @@ class sale_advance_payment_inv(models.TransientModel):
                     nro_cuotas = len(sale.cuota_ids)
 
                     invoice_id = self._create_invoices(cr, uid, datos, sale_ids[0], context=context)
-                    invoice_obj.write(cr, uid, invoice_id, datos, context=context)
+                    #invoice_id = super(self, sale_advance_payment_inv).create_invoices(cr, uid, datos, sale_ids[0], context=context)
+                    #invoice_obj.write(cr, uid, invoice_id, datos, context=context)
 
                     cuota_obj = self.pool.get('sale.order.line.cuota')
                     cuota_obj.write(cr, uid, cuota.id, {'invoice_id': invoice_id}, context=context)
@@ -177,10 +178,12 @@ class sale_advance_payment_inv(models.TransientModel):
                     }
                     sale_order_line_ids = cuota.order_line_id
                     self.generate_invoice_lines(cr, uid, sale_order_line_ids, data_il, context)
-                    invoice_obj.button_reset_taxes(cr, uid, invoice_id, context)
+		    invoice = invoice_obj.browse(cr,uid,invoice_id,context)
+                    #invoice_obj.button_reset_taxes(cr, uid, invoice_id, context)
+                    #invoice.button_reset_taxes()
 
                     if nro_cuota == nro_cuotas:
-                        sale_obj.write(cr, uid, [sale.id], {'state': 'progress'})
+                        #sale_obj.write(cr, uid, [sale.id], {'state': 'progress'})
                         if context.get('open_invoices', False):
                             return sale_obj.action_view_invoice(cr, uid, sale_ids, context=context)
                         return {'type': 'ir.actions.act_window_close'}
@@ -211,6 +214,7 @@ class sale_advance_payment_inv(models.TransientModel):
         inv_ids = []
         for sale_id, inv_values in self._prepare_advance_invoice_vals(cr, uid, ids, context=context):
             inv_ids.append(self._create_invoices(cr, uid, inv_values, sale_id, context=context))
+            #inv_ids.append(super(self, sale_advance_payment_inv)._create_invoices(cr, uid, inv_values, sale_id, context=context))
 
         if context.get('open_invoices', False):
             return self.open_invoices(cr, uid, ids, inv_ids, context=context)
@@ -228,7 +232,7 @@ class sale_advance_payment_inv(models.TransientModel):
             price_unit = data['price_unit']
 
             invoice_line_id = invoice_line_obj.create(cr, uid, {
-                'account_id': model.order_partner_id.property_account_receivable.id,
+                'account_id': model.order_partner_id.property_account_receivable_id.id,
                 'invoice_id': data['invoice_id'],
                 'price_unit': price_unit,
                 'product_id': model.product_id.id,
@@ -244,3 +248,18 @@ class sale_advance_payment_inv(models.TransientModel):
 
     def _prepare_advance_invoice_vals2(self, cr, uid, ids, vals=None, context=None):
         return vals
+
+    def _create_invoices(self, cr, uid, inv_values, sale_id, context=None):
+        inv_obj = self.pool.get('account.invoice')
+        sale_obj = self.pool.get('sale.order')
+        inv_id = inv_obj.create(cr, uid, inv_values, context=context)
+        #inv_obj.button_reset_taxes(cr, uid, [inv_id], context=context)
+	inv = self.pool.get('account.invoice').browse(cr,uid,inv_id)
+	inv.compute_taxes()
+        # dummy write on self to trigger recomputations
+        #self.with_context(context).write({'invoice_line': []})
+
+        # add the invoice to the sales order's invoices
+        sale_obj.write(cr, uid, sale_id, {'invoice_ids': [(4, inv_id)]}, context=context)
+        return inv_id
+
