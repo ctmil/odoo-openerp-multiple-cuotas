@@ -212,7 +212,7 @@ class sale_advance_payment_inv(models.TransientModel):
                 return res
             return {'type': 'ir.actions.act_window_close'}
 
-        if wizard.advance_payment_method == 'percentage':
+        if wizard.advance_payment_method in ['percentage','fixed']:
 	    for sale_id in sale_ids:
 		sale_order = self.pool.get('sale.order').browse(cr,uid,sale_id)
 		for line in sale_order.order_line:
