@@ -23,7 +23,7 @@
                     <field name="monto_cuota" attrs="{'readonly':[('state','!=','draft')]}" />
                     <field name="fecha_creacion" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="fecha_vencimiento" attrs="{'readonly':[('state','!=','draft')]}" />
-                    <field name="invoice_id" invisible="1" />
+                    <field name="invoice_id" />
                     <field name="status" attrs="{'readonly':[('state','=','draft')]}" />
                   </tree>
                 </field>
