@@ -137,6 +137,10 @@ class sale_advance_payment_inv(models.TransientModel):
         if wizard.advance_payment_method == 'multiple':
             sale = sale_obj.browse(cr, uid, sale_ids, context=context)[0]
             if sale.cuota_ids:
+                for cuota in sale.cuota_ids:
+		    if cuota.invoice_id:
+                    	raise exceptions.ValidationError(
+                            "Cuotas ya facturadas")
                 tax = sale.order_line[0].tax_id.amount
                 c_monto = round(sum(c.monto_cuota for c in sale.cuota_ids), 6)
                 amount_untaxed = round(sale.amount_untaxed, 6)
