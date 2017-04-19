@@ -8,7 +8,7 @@
       <field name="arch" type="xml">
           <!-- xpath expr="//form/sheet/notebook/page[0]/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after" -->
           <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
-            <button string="Crear Cuotas" name="action_create_cuota" type="object" class="oe_highlight"/>
+            <button string="Crear Cuotas" name="action_create_cuota" type="object" class="oe_highlight" />
           </xpath>
 
         <xpath expr="//field[@name='note']" position="before">

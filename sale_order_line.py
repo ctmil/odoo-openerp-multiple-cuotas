@@ -39,6 +39,11 @@ class sale_order_line(models.Model):
     @api.multi
     def action_create_cuota(self):
         self.ensure_one()
+	if self.cuota_ids:
+		raise exceptions.ValidationError("Ya hay cuotas generadas")
+	if self.order_id.state not in ['draft','sent']:
+		raise exceptions.ValidationError("No se pueden generar cuotas a ordenes confirmadas/canceladas")
+		
         return {
             'context': self.env.context,
             'name': 'Crear Cuotas',

@@ -107,7 +107,11 @@ class sale_order_dates(models.TransientModel):
 
                 if list_created:
                     msg = 'El cliente %s ya tiene cuotas en el mes: %s' % (customer_name, list_created)
-                    return self.action_popup(msg)
+                    #return self.action_popup(msg)
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'reload',
+                    }
                 else:
                     return {
                         'type': 'ir.actions.client',
