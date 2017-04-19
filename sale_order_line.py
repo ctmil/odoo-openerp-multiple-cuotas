@@ -200,13 +200,31 @@ class sale_advance_payment_inv(models.TransientModel):
             return {'type': 'ir.actions.act_window_close'}
 
         if wizard.advance_payment_method == 'all':
+	    for sale_id in sale_ids:
+		sale_order = self.pool.get('sale.order').browse(cr,uid,sale_id)
+		for line in sale_order.order_line:
+			if line.cuota_ids:
+				raise exceptions.ValidationError("Orden tiene cuotas.\nSe debe seleccionar la opción 'Hacer varias facturas'")
+				
             res = sale_obj.manual_invoice(cr, uid, sale_ids, context)
 
             if context.get('open_invoices', False):
                 return res
             return {'type': 'ir.actions.act_window_close'}
 
+        if wizard.advance_payment_method == 'percentage':
+	    for sale_id in sale_ids:
+		sale_order = self.pool.get('sale.order').browse(cr,uid,sale_id)
+		for line in sale_order.order_line:
+			if line.cuota_ids:
+				raise exceptions.ValidationError("Orden tiene cuotas.\nSe debe seleccionar la opción 'Hacer varias facturas'")
+
         if wizard.advance_payment_method == 'lines':
+	    for sale_id in sale_ids:
+		sale_order = self.pool.get('sale.order').browse(cr,uid,sale_id)
+		for line in sale_order.order_line:
+			if line.cuota_ids:
+				raise exceptions.ValidationError("Orden tiene cuotas.\nSe debe seleccionar la opción 'Hacer varias facturas'")
             # open the list view of sales order lines to invoice
             res = act_window.for_xml_id(cr, uid, 'sale', 'action_order_line_tree2', context)
             res['context'] = {

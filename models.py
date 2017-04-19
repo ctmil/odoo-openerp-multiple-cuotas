@@ -36,7 +36,7 @@ class Sale_Order_Line_Cuota(models.Model):
 
     CHOICE_STATE = [('active', 'Activo'), ('cancel', 'Cancelado'), ('annul', 'Anulado')]
 
-    monto_cuota = fields.Float(u"Monto SIN IGV",
+    monto_cuota = fields.Float(u"Monto Neto",
                                digits_compute=dp.get_precision('Product Price'),
                                required=True)
     fecha_vencimiento = fields.Date(u"Fecha de vencimiento",
