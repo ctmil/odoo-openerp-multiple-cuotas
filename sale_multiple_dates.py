@@ -101,7 +101,7 @@ class sale_order_dates(models.TransientModel):
                     count_cuota = count_cuota -1
                     if count_cuota > 0:
                         # month = self.env['ir.translation'].date_part(fecha, 'month', format='char', lang='pe')
-                        month = date[5:7]
+                        month = fecha[5:7]
                         to_warning = month + ' (' + str(count_cuota) + ')'
                         list_created.append(to_warning)
 
